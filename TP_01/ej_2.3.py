@@ -52,4 +52,4 @@ def cambiarDuracion(pelicula:Pelicula, nueva_duracion:int) -> None:
     print(f"Despues: {pelicula.getTitulo()} - {pelicula.getDuracionMin()}m", end="\n\n")
 
 cambiarDuracion(peliculas[0], 100)
-cambiarDuracion(peliculas[1], 140)
+cambiarDuracion(peliculas[1], 115)
