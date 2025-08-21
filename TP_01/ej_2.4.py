@@ -69,14 +69,15 @@ for i in vuelos:
 print(f"Vuelos desde {ORIGEN_FILTRO} por menos de ${PRECIO_LIMITE}: {codigos}")
 
 # Mostrar el vuelo más barato
-codigo_barato = vuelos[0].getCodigo()
-precio_barato = vuelos[0].getPrecio()
+def mostrarMasBarato(vuelos:list) -> None:
+    codigo_barato = vuelos[0].getCodigo()
+    precio_barato = vuelos[0].getPrecio()
 
-for i in vuelos:
-    if i.getPrecio() < precio_barato:
-        codigo_barato = i.getCodigo()
-        precio_barato = i.getPrecio()
-print(f"El vuelo más barato es: {codigo_barato} - ${precio_barato:.2f}")
+    for i in vuelos:
+        if i.getPrecio() < precio_barato:
+            codigo_barato = i.getCodigo()
+            precio_barato = i.getPrecio()
+    print(f"El vuelo más barato es: {codigo_barato} - ${precio_barato:.2f}")
 
 # Cambiar el precio de un vuelo
 def cambiarPrecio(vuelo:Vuelo, nuevo_precio:float) -> None:
@@ -84,4 +85,6 @@ def cambiarPrecio(vuelo:Vuelo, nuevo_precio:float) -> None:
     vuelo.setPrecio(nuevo_precio)
     print(f"Despues: {vuelo.getCodigo()} - ${vuelo.getPrecio():.2f}", end="\n\n")
 
-cambiarPrecio(vuelos[0], 199000)
+mostrarMasBarato(vuelos)
+cambiarPrecio(vuelos[0], 100000)
+mostrarMasBarato(vuelos)

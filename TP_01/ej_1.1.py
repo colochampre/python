@@ -10,8 +10,9 @@ la_plata = Ciudad("La Plata", "Buenos Aires", 700000)
 mar_del_plata = Ciudad("Mar del Plata", "Buenos Aires", 620000)
 
 # Mostrar atributos de las ciudades
-#print(la_plata.nombre, la_plata.provincia, la_plata.poblacion, sep=", ")
-#print(mar_del_plata.nombre, mar_del_plata.provincia, mar_del_plata.poblacion, sep=", ")
+print(la_plata.nombre, la_plata.provincia, la_plata.poblacion, sep=", ")
+print(mar_del_plata.nombre, mar_del_plata.provincia, mar_del_plata.poblacion, sep=", ")
 
+# Mostrar atributos con el diccionario interno
 print(vars(la_plata))
 print(vars(mar_del_plata))
