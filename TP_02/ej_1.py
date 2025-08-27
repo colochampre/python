@@ -1,126 +1,104 @@
 # -------------------------------- Utilidades --------------------------------
 def limpiar_texto(valor) -> str:
-    return ''if valor is None else str(valor).strip()
+    """A texto, sin espacios a los bordes; None -> ''."""
+    return "" if valor is None else str(valor).strip()
 
-def es_numero_cuenta_valida(cuenta:str) -> bool:
-    return len(cuenta) == 5 and cuenta.isdigit()
+def colapsar_espacios(s: str) -> str:
+    return " ".join(limpiar_texto(s).split())
 
-def pedir_numero_cuenta_valido(valor) -> str:
-    s = limpiar_texto(valor)
-    while not es_numero_cuenta_valida(s):
-        if s:
-            print('Error: El numero de cuenta debe tener 14 dígitos numéricos.')
-        s = limpiar_texto(input('Ingrese numero de cuenta (14 dígitos numéricos): '))
-    return s
+def solo_digitos(s: str) -> str:
+    """Solo 0-9 (quita puntos, guiones, espacios, etc.)."""
+    return "".join(ch for ch in str(s) if ch.isdigit())
 
-def colapsar_espacios(texto:str) -> str:
-    return ' '.join(texto.split())
+def a_numero(valor) -> float:
+    try:
+        return float(str(valor).replace(",", "."))
+    except ValueError:
+        raise ValueError("Número inválido")
 
-def es_nombre_valido(nombre:str) -> bool:
-    if not (3 <= len(nombre) <= 80):
-        return False
-    permitidos = set(" -'áéíóúÁÉÍÓÚüÜñÑ")
-    return all(c.isalpha() or c in permitidos for c in nombre)
+def es_cadena_n_digitos(s: str, n: int) -> bool:
+    return len(s) == n and s.isdigit()
 
-def pedir_nombre_valido(valor=None, input=input) -> str:
-    s = colapsar_espacios(limpiar_texto(valor))
-    while not es_nombre_valido(s):
-        if s:
-            print('Error: El nombre debe tener entre 1 y 100 caracteres y solo letras, espacios, guiones y apóstrofes.')
-        s = colapsar_espacios(limpiar_texto(input('Ingrese nombre (1-100 caracteres): ')))
-    return s
+def es_enumerado(valor: str, dominio: set[str]) -> bool:
+    return limpiar_texto(valor).upper() in dominio
 
-def solo_digitos(texto:str) -> str:
-    return ''.join(c for c in texto if c.isdigit())
+def es_monto_no_cero(x: float) -> bool:
+    """True si |x| > 0."""
+    return abs(x) > 0
 
-def es_identificador_11_valido(digitos:str) -> bool:    
-    return len(digitos) == 11 and digitos.isdigit()
-
-def pedir_identificador_11_valido(valor, input=input) -> str:
-    d = solo_digitos(limpiar_texto(valor))
-    while not es_identificador_11_valido(d):
-        if d:
-            print('Error: El identificador debe tener 11 dígitos numéricos.')
-        d = solo_digitos(limpiar_texto(input('Ingrese identificador (11 dígitos numéricos): ')))
+def validar_numero_cuenta14(s: str) -> str:
+    """14 dígitos exactos, sin separadores."""
+    d = solo_digitos(s)
+    if not es_cadena_n_digitos(d, 14):
+        raise ValueError("numero_cuenta debe tener 14 dígitos (0 -9).")
     return d
 
-def es_cbu_valido(cbu:str) -> bool:
-    return len(cbu) == 22 and cbu.isdigit()
+def normalizar_titular(s: str) -> str:
+    """Guarda MAYÚSCULAS; Longitud 1..100; colapsa espacios."""
+    s = colapsar_espacios(s)
+    if not (1 <= len(s) <= 100):
+        raise ValueError("titular inválido: 1-100 caracteres.")
+    permitidos = set(" -'áéíóúÁÉÍÓÚñÑ")
+    if not all(ch.isalpha() or ch in permitidos for ch in s):
+        raise ValueError("titular inválido: use letras, espacios, ' -' o '''.")
+    return s.upper()
 
-def pedir_cbu_valido(valor) -> str:
-    s = limpiar_texto(valor)
-    while not es_cbu_valido(s):
-        if s:
-            print('Error: El CBU debe tener 22 dígitos numéricos.')
-        s = limpiar_texto(input('Ingrese CBU (22 dígitos numéricos): '))
+def normalizar_cuil(s: str) -> str:
+    """Devuelve 11 dígitos (sin separadores)."""
+    d = solo_digitos(s)
+    if not es_cadena_n_digitos(d, 11):
+        raise ValueError("cuil debe tener 11 dígitos.")
+    return d
+
+_ALIAS_RE = re.compile(r"^[A-Za-z0-9.\-]{6,20}$")
+
+def validar_alias(s: str) -> str:
+    """6–20 chars alfanuméricos, punto o guion."""
+    s = limpiar_texto(s)
+    if not _ALIAS_RE.fullmatch(s):
+        raise ValueError("alias inválido: 6-20 [A-Za-z0-9 . -].")
     return s
 
-def a_numero(monto) -> float:
-    try:
-        return float(str(monto).replace(',', '.'))
-    except ValueError:
-        return 0.0 # Forzar error
-
-def es_monto_no_cero(monto) -> bool:
-    return abs(monto) >= 0.0
-
-def pedir_monto_valido(valor, input=input) -> float:
-    m = a_numero(valor)
-    while not es_monto_no_cero(m):
-        if str(valor). not in (None, '', '0', '0.0'):
-            print('Error: El monto debe ser un número mayor a cero.')
-        monto = input('Ingrese monto (mayor a cero): ')
-        m = a_numero(monto)
-    return m
-
-def formatear_monto(monto:float) -> str:
-    signo = '+' if monto >= 0 else '-'
-    return f'{signo}{abs(monto):.2f}'
+def validar_monto_no_cero(monto) -> float:
+    """Convierte y valida que el valor absoluto sea > 0. Devuelve float."""
+    x = a_numero(monto)
+    if not es_monto_no_cero(x):
+        raise ValueError("El monto debe ser distinto de 0.")
+    return x
 
 # ------------------------------- Clase Cuenta -------------------------------
 class Cuenta:
-
     def __init__(self, numero_cuenta, titular, cuil, cbu, alias, saldo):
-        self.__numero_cuenta = pedir_numero_cuenta_valido(numero_cuenta) # 5 dígitos numéricos
+        self.__numero_cuenta = validar_numero_cuenta14(numero_cuenta) # 14 dígitos numéricos
         self.__titular = str(titular) # 1-100 caracteres
         self.__cuil = str(cuil) # xx-xxxxxxxx-x
         self.__cbu = str(cbu) # 22 dígitos numéricos
         self.__alias = str(alias) # 3-20 caracteres
         self.__saldo = float(saldo)
 
+    def __str__(self):
+        return f"{self.numero_cuenta}, {self.titular}, {self.__cuil}, {self.__cbu}, {self.__alias}, {self.__saldo}"
+
     # Getters
     @property
     def numero_cuenta(self) -> str:
-        return self.__numero_cuenta
-
-    @property
-    def numero_cuenta_formateada(self) -> str:
-        return f'LEG-{self.__numero_cuenta}'
+        return f'CA ${self.__numero_cuenta}'
 
     @property
     def titular(self) -> str:
-        return self.__titular
-
-    @property
-    def titular_formateado(self) -> str: # Capitaliza cada nombre del titular. Ej: Pepe Argento
         return " ".join(p.capitalize() for p in self.__titular.split())
 
     @property
     def cuil(self) -> str:
-        return self.__cuil
-        
-    @property
-    def cuil_formateado(self) -> str:
         ''' Devuelve "AA-BBBBBBBB-C" a partir de 11 digitos'''
-        a = digitos[:2]
-        b = digitos[2:10]
-        c = digitos[10]
+        a = self.digitos[:2]
+        b = self.digitos[2:10]
+        c = self.digitos[10]
         return f'{a}-{b}-{c}'
-
+        
     @property
     def cbu(self) -> str:
         return self.__cbu
-
 
     @property
     def alias(self) -> str:
@@ -131,8 +109,14 @@ class Cuenta:
         return self.__saldo
 
     # Setters
+    @numero_cuenta.setter
+    def numero_cuenta(self, nuevo_numero_cuenta):
+        self.__numero_cuenta = validar_numero_cuenta14(nuevo_numero_cuenta)
+
     @titular.setter
     def titular(self, nuevo_titular):
-        self.__titular = nuevo_titular
+        self.__titular = normalizar_titular(nuevo_titular)
 
-    
+cuenta_1 = Cuenta('e', '', '39999999', '123456789012345678901234', 'JUAN.PEREZ', 0.0)
+
+print(cuenta_1)
