@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 # -------------------------------- Utilidades --------------------------------
 def limpiar_texto(valor) -> str:
@@ -90,13 +91,19 @@ def es_monto_no_cero(x: float) -> bool:
     return abs(x) > 0
 
 def pedir_monto_hasta_valido(valor_inicial=None, input_fn=input) -> float:
-    m = a_numero(valor_inicial)
-    while not es_monto_no_cero(m):
-        if str(valor_inicial) not in (None, "", "0", "0.0"):
-            print("Monto inválido. Debe ser distinto de 0.")
-        valor_inicial = input_fn("Ingrese monto (positivo o negativo, ≠ 0):")
-    m = a_numero(valor_inicial)
-    return m
+    if valor_inicial is not None:
+        m = a_numero(valor_inicial)
+        if es_monto_no_cero(m):
+            return m
+    while True:
+        valor_ingresado = input_fn("Ingrese monto (positivo o negativo, ≠ 0):")
+        m = a_numero(valor_ingresado)
+        if es_monto_no_cero(m):
+            return m
+        print("Monto inválido. Debe ser distinto de 0.")
+
+def ahora_str() -> str:
+    return datetime.now().strftime('%Y-%m-%d %H:%M')
 
 # ------------------------------- Clase Cuenta -------------------------------
 class Cuenta:
@@ -105,7 +112,7 @@ class Cuenta:
         self.__titular = pedir_titular_hasta_valido(titular) # 1-100 caracteres
         self.__cuil = pedir_cuil_hasta_valido(cuil) # xx-xxxxxxxx-x
         self.__cbu = pedir_cbu_hasta_valido(cbu) # 22 dígitos numéricos
-        self.__alias = validar_alias(alias) # 3-20 caracteres
+        self.__alias = validar_alias(alias) # 6-20 caracteres
         self.__saldo = pedir_monto_hasta_valido(saldo)
 
     def __str__(self):
@@ -147,7 +154,7 @@ class Cuenta:
 
     @property
     def saldo_formateado(self) -> str:
-        return f"${self.__saldo:.2f}"
+        return f"Saldo: ${self.__saldo:.2f}"
 
     @staticmethod
     def formatear_cuil(digitos:str) -> str:
@@ -179,27 +186,31 @@ class Cuenta:
         self.__cuil = normalizar_cuil(nuevo_cuil)
 
     # Metodos
+    @staticmethod
+    def imprimir_evento_linea(motivo: str, monto: float) -> str:
+        return f"Fecha: {ahora_str()} – Motivo: {motivo} – Importe: {monto:.2f}"
+
     def retirar_monto(self):
-        monto = float(input("Ingrese el monto a retirar: "))
+        monto = pedir_monto_hasta_valido()
         if monto > self.saldo:
             print("Error: Saldo insuficiente")
         else:
             self.__saldo -= monto
-            self.informar_movimiento(monto)
+            print(self.imprimir_evento_linea("Retiro", monto))
 
     def depositar_monto(self):
-        monto = float(input("Ingrese el monto a depositar: "))
+        monto = pedir_monto_hasta_valido()
         if monto < 0:
             print("Error: Monto inválido")
         else:
             self.__saldo += monto
-            self.informar_movimiento(monto)
+            print(self.imprimir_evento_linea("Depósito", monto))
 
-    def informar_movimiento(self, monto): # N° de cuenta: CA $ XXXX – Nombre del titular: XXXX – Fecha: XXXX – motivo: XXXX – Monto: XXXX
-        print(f"N° de cuenta: {self.numero_cuenta_formateado} – Nombre del titular: {self.titular} – Fecha: {datetime.now().strftime('%Y-%m-%d')} – motivo: {monto} – Monto: {monto}")
+    def consultar_saldo(self): # Nombre del titular: XXXX – N° de cuenta: CA $ XXXX – Saldo: XXXX.XX
+        print(f"Nombre del titular: {self.titular} – N° de cuenta: {self.numero_cuenta_formateado} – Saldo: {self.saldo_formateado}")
 
 # --------------------------------- Programa ---------------------------------
-cuenta_1 = Cuenta('21100000000037', '', '', '0110030330123456749017', 'JAMON.JUGO.NUTRIA', '1000.0')
+cuenta_1 = Cuenta('21100000000037', '', '22399999993', '0110030330123456749017', 'JAMON.JUGO.NUTRIA', '1000.0')
 
 def mostrar_menu():
     print("\nMenu")
@@ -207,11 +218,11 @@ def mostrar_menu():
     print("2. Retirar dinero")
     print("3. Depositar dinero")
     print("4. Consultar saldo")
-    print("5. Salir")
-    return input("Ingrese una opcion: ")
+    print("5. Salir", end="\n\n")
 
 while True:
-    opcion = mostrar_menu()
+    mostrar_menu()
+    opcion = input("Ingrese una opcion (1-5): ")
     if opcion == "1":
         print(cuenta_1)
     elif opcion == "2":
@@ -219,7 +230,7 @@ while True:
     elif opcion == "3":
         cuenta_1.depositar_monto()
     elif opcion == "4":
-        print(cuenta_1.saldo_formateado)
+        cuenta_1.consultar_saldo()
     elif opcion == "5":
         break
     else:
