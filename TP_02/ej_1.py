@@ -73,11 +73,15 @@ def normalizar_cuil(s: str) -> str:
 
 _ALIAS_RE = re.compile(r"^[A-Za-z0-9.\-]{6,20}$")
 
-def validar_alias(s: str) -> str:
-    """6-20 chars alfanuméricos, punto o guion."""
-    s = limpiar_texto(s)
-    if not _ALIAS_RE.fullmatch(s):
-        raise ValueError("Alias inválido: 6-20 [A-Za-z0-9 . -].")
+def es_alias_valido(s: str) -> bool:
+    return _ALIAS_RE.fullmatch(s)
+
+def pedir_alias_hasta_valido(valor_inicial=None, input_fn=input) -> str:
+    s = colapsar_espacios(limpiar_texto(valor_inicial))
+    while not es_alias_valido(s):
+        if s:
+            print("Alias inválido: 6-20 [A-Za-z0-9 . -].")
+        s = colapsar_espacios(limpiar_texto(input_fn("Ingrese el alias: ")))
     return s
 
 def a_numero(valor) -> float:
@@ -112,7 +116,7 @@ class Cuenta:
         self.__titular = pedir_titular_hasta_valido(titular) # 1-100 caracteres
         self.__cuil = pedir_cuil_hasta_valido(cuil) # xx-xxxxxxxx-x
         self.__cbu = pedir_cbu_hasta_valido(cbu) # 22 dígitos numéricos
-        self.__alias = validar_alias(alias) # 6-20 caracteres
+        self.__alias = pedir_alias_hasta_valido(alias) # 6-20 caracteres
         self.__saldo = pedir_monto_hasta_valido(saldo)
 
     def __str__(self):
@@ -168,22 +172,13 @@ class Cuenta:
     def formatear_numero_cuenta(digitos:str) -> str:
         return f'CA ${digitos}'
 
-    # Setters
     @property
     def titular(self):
         return self.__titular
 
-    @titular.setter
-    def titular(self, nuevo_titular):
-        self.__titular = normalizar_titular(nuevo_titular)
-
     @property
     def cuil(self):
         return self.__cuil
-
-    @cuil.setter
-    def cuil(self, nuevo_cuil):
-        self.__cuil = normalizar_cuil(nuevo_cuil)
 
     # Metodos
     @staticmethod
@@ -210,7 +205,7 @@ class Cuenta:
         print(f"Nombre del titular: {self.titular} – N° de cuenta: {self.numero_cuenta_formateado} – Saldo: {self.saldo_formateado}")
 
 # --------------------------------- Programa ---------------------------------
-cuenta_1 = Cuenta('21100000000037', '', '22399999993', '0110030330123456749017', 'JAMON.JUGO.NUTRIA', '1000.0')
+cuenta_1 = Cuenta('21100000000037', '', '22399999993', '0110030330123456749017', 'a', '1000.0')
 
 def mostrar_menu():
     print("\nMenu")
