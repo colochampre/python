@@ -17,8 +17,11 @@ def solo_digitos(s: str) -> str:
     return "".join(ch for ch in str(s) if ch.isdigit())
 
 
-def es_cadena_n_digitos(s: str, n: int) -> bool:
-    return len(s) == n and s.isdigit()
+def a_numero(valor) -> float:
+    try:
+        return float(str(valor).replace(",", "."))
+    except ValueError:
+        return 0.0
 
 
 def es_nombre_valido(s: str) -> bool:
@@ -28,18 +31,14 @@ def es_nombre_valido(s: str) -> bool:
     return all(ch.isalpha() or ch in permitidos for ch in s)
 
 
-_ALIAS_RE = re.compile(r"^[A-Za-z0-9.\-]{6,20}$")
+def es_cadena_n_digitos(s: str, n: int) -> bool:
+    return len(s) == n and s.isdigit()
 
+
+_ALIAS_RE = re.compile(r"^[A-Za-z0-9.\-]{6,20}$")
 
 def es_alias_valido(s: str) -> bool:
     return _ALIAS_RE.fullmatch(s)
-
-
-def a_numero(valor) -> float:
-    try:
-        return float(str(valor).replace(",", "."))
-    except ValueError:
-        return 0.0
 
 
 def es_monto_no_cero(x: float) -> bool:
@@ -102,25 +101,6 @@ def pedir_monto_hasta_valido(valor_inicial=None, input_fn=input) -> float:
         if es_monto_no_cero(m):
             return m
         print("Monto inválido. Debe ser distinto de 0.")
-
-
-def normalizar_titular(s: str) -> str:
-    """Guarda MAYÚSCULAS; Longitud 1..100; colapsa espacios."""
-    s = colapsar_espacios(s)
-    if not (1 <= len(s) <= 100):
-        raise ValueError("titular inválido: 1-100 caracteres.")
-    permitidos = set(" -'áéíóúÁÉÍÓÚñÑ")
-    if not all(ch.isalpha() or ch in permitidos for ch in s):
-        raise ValueError("titular inválido: use letras, espacios, ' -' o '''.")
-    return s.upper()
-
-
-def normalizar_cuil(s: str) -> str:
-    """Devuelve 11 dígitos (sin separadores)."""
-    d = solo_digitos(s)
-    if not es_cadena_n_digitos(d, 11):
-        raise ValueError("El CUIL debe tener 11 dígitos.")
-    return d
 
 
 def ahora_str() -> str:
