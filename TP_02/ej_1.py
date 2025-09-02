@@ -183,7 +183,7 @@ class Cuenta:
         return self.__cuil
 
 
-    # Metodos
+    # ------------------------------- Metodos --------------------------------
     @staticmethod
     def imprimir_evento_linea(motivo: str, monto: float) -> str:
         return f"Fecha: {ahora_str()} – Motivo: {motivo} – Importe: {monto:.2f}"
@@ -205,6 +205,7 @@ class Cuenta:
         else:
             self.__saldo += monto
             print(self.imprimir_evento_linea("Depósito", monto))
+
 
     def consultar_saldo(self): # Nombre del titular: XXXX – N° de cuenta: CA $ XXXX – Saldo: XXXX.XX
         print(f"Nombre del titular: {self.titular} – N° de cuenta: CA $ {self.formatear_numero_cuenta(self.numero_cuenta)} – Saldo: ${self.saldo:.2f}")
