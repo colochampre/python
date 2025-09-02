@@ -127,6 +127,11 @@ class Cuenta:
     @property
     def numero_cuenta(self) -> str:
         return self.__numero_cuenta
+    
+
+    @property
+    def numero_cuenta_formateado(self) -> str:
+        return f"CA $ {self.__numero_cuenta}"
 
 
     @property
@@ -141,7 +146,7 @@ class Cuenta:
 
     @property
     def cuil_formateado(self) -> str:
-        return Cuenta.formatear_cuil(self.__cuil)
+        return self.formatear_cuil(self.__cuil)
         
     
     @property
@@ -166,12 +171,7 @@ class Cuenta:
         b = digitos[2:10]
         c = digitos[10]
         return f'{a}-{b}-{c}'
-
-
-    @staticmethod
-    def formatear_numero_cuenta(digitos:str) -> str:
-        return f'CA $ {digitos}'
-
+    
 
     @property
     def titular(self):
@@ -208,12 +208,71 @@ class Cuenta:
 
 
     def consultar_saldo(self): # Nombre del titular: XXXX – N° de cuenta: CA $ XXXX – Saldo: XXXX.XX
-        print(f"Nombre del titular: {self.titular} – N° de cuenta: CA $ {self.formatear_numero_cuenta(self.numero_cuenta)} – Saldo: ${self.saldo:.2f}")
+        print(f"Nombre del titular: {self.titular} – N° de cuenta: {self.numero_cuenta_formateado} – Saldo: ${self.saldo:.2f}")
+
+
+# -------------------------------- Subclases ---------------------------------
+class CuentaCorriente(Cuenta):
+    def __init__(self, numero_cuenta, titular, cuil, cbu, alias, saldo, descubierto=0.0):
+        super().__init__(numero_cuenta, titular, cuil, cbu, alias, saldo)
+        self.__descubierto = descubierto  # Monto máximo de descubierto permitido (>=0)
+
+
+    def __str__(self):
+        base = super().__str__()
+        return f"{base}\nDescubierto máximo: {self.descubierto_formateado}"
+    
+
+    @property
+    def numero_cuenta_formateado(self) -> str:
+        """Sobrescribe el método de la clase padre para usar 'CC'."""
+        return f"CC $ {self.numero_cuenta}"
+
+
+    @property
+    def descubierto(self) -> float:
+        return self.__descubierto
+    
+
+    @property
+    def descubierto_formateado(self) -> str:
+        return f'${self.__descubierto:.2f}'
+
+
+    @staticmethod
+    def __validar_descubierto(valor: float) -> float:
+        v = a_numero(valor)
+        if v < 0:
+            print("El descubierto no puede ser negativo.")
+            return 0.0
+        return v
+    
+
+    def cambiar_descubierto(self, nuevo_valor: float) -> None:
+        self.__descubierto = CuentaCorriente.__validar_descubierto(nuevo_valor)
+        print(f"Nuevo descubierto máximo: {self.descubierto_formateado}")
+
+
+    def extraer(self, monto: float) -> bool:
+        monto = pedir_monto_hasta_valido(monto)
+        saldo_actual = self.saldo
+        limite = saldo_actual + self.__descubierto
+        if monto > limite:
+            print("Limite de descubierto excedido.")
+            return False
+        self._Cuenta__saldo = saldo_actual - monto
+        print(self.imprimir_evento_linea("Extracción", monto))
+        return True
+
+
+# ----------------------------- Caja de Ahorro -------------------------------
+class CuentaAhorro(Cuenta):
+    pass
 
 
 # --------------------------------- Programa ---------------------------------
-cuenta_1 = Cuenta('21100000000037', '', '22399999993', '0110030330123456749017', 'a', '1000.0')
-
+cuenta_1 = CuentaCorriente('21100000000037', 'Pepe', '22399999993', '0110030330123456749017', 'a', '1000.0')
+cuenta_1.cambiar_descubierto(5000.0)
 
 def mostrar_menu():
     print("\nMenu")
@@ -230,7 +289,8 @@ while True:
     if opcion == "1":
         print(cuenta_1)
     elif opcion == "2":
-        cuenta_1.retirar_monto()
+        m = pedir_monto_hasta_valido()
+        cuenta_1.extraer(m)
     elif opcion == "3":
         cuenta_1.depositar_monto()
     elif opcion == "4":
