@@ -215,7 +215,7 @@ class Cuenta:
 class CuentaCorriente(Cuenta):
     def __init__(self, numero_cuenta, titular, cuil, cbu, alias, saldo, descubierto=0.0):
         super().__init__(numero_cuenta, titular, cuil, cbu, alias, saldo)
-        self.__descubierto = descubierto  # Monto máximo de descubierto permitido (>=0)
+        self.__descubierto = self.__validar_descubierto(descubierto)
 
 
     def __str__(self):
@@ -249,7 +249,7 @@ class CuentaCorriente(Cuenta):
     
 
     def cambiar_descubierto(self, nuevo_valor: float) -> None:
-        self.__descubierto = CuentaCorriente.__validar_descubierto(nuevo_valor)
+        self.__descubierto = self.__validar_descubierto(nuevo_valor)
         print(f"Nuevo descubierto máximo: {self.descubierto_formateado}")
 
 
@@ -271,7 +271,7 @@ class CuentaAhorro(Cuenta):
 
 
 # --------------------------------- Programa ---------------------------------
-cuenta_1 = CuentaCorriente('21100000000037', 'Pepe', '22399999993', '0110030330123456749017', 'a', '1000.0')
+cuenta_1 = CuentaCorriente('21100000000037', 'Pepe Ejemplo', '22399999993', '0110030330123456749017', 'PEPE.EJEMPLO', '100000.0', '100000.0')
 cuenta_1.cambiar_descubierto(5000.0)
 
 def mostrar_menu():
