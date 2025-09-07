@@ -270,32 +270,33 @@ class CuentaAhorro(Cuenta):
     pass
 
 
-# --------------------------------- Programa ---------------------------------
-cuenta_1 = CuentaCorriente('21100000000037', 'Pepe Ejemplo', '22399999993', '0110030330123456749017', 'PEPE.EJEMPLO', '100000.0', '100000.0')
-cuenta_1.cambiar_descubierto(5000.0)
+# --------------------------------- Testing ----------------------------------
+if __name__ == "__main__":
+    cuenta_1 = CuentaCorriente('21100000000037', 'Pepe Ejemplo', '22399999993', '0110030330123456749017', 'PEPE.EJEMPLO', '100000.0', '100000.0')
+    cuenta_1.cambiar_descubierto(5000.0)
+    
+    def mostrar_menu():
+        print("\nMenu")
+        print("1. Consultar datos de la cuenta")
+        print("2. Retirar dinero")
+        print("3. Depositar dinero")
+        print("4. Consultar saldo")
+        print("5. Salir", end="\n\n")
 
-def mostrar_menu():
-    print("\nMenu")
-    print("1. Consultar datos de la cuenta")
-    print("2. Retirar dinero")
-    print("3. Depositar dinero")
-    print("4. Consultar saldo")
-    print("5. Salir", end="\n\n")
 
-
-while True:
-    mostrar_menu()
-    opcion = input("Ingrese una opcion (1-5): ")
-    if opcion == "1":
-        print(cuenta_1)
-    elif opcion == "2":
-        m = pedir_monto_hasta_valido()
-        cuenta_1.extraer(m)
-    elif opcion == "3":
-        cuenta_1.depositar_monto()
-    elif opcion == "4":
-        cuenta_1.consultar_saldo()
-    elif opcion == "5":
-        break
-    else:
-        print("Opcion no valida")
+    while True:
+        mostrar_menu()
+        opcion = input("Ingrese una opcion (1-5): ")
+        if opcion == "1":
+            print(cuenta_1)
+        elif opcion == "2":
+            m = pedir_monto_hasta_valido()
+            cuenta_1.extraer(m)
+        elif opcion == "3":
+            cuenta_1.depositar_monto()
+        elif opcion == "4":
+            cuenta_1.consultar_saldo()
+        elif opcion == "5":
+            break
+        else:
+            print("Opcion no valida")
