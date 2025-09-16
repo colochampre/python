@@ -53,9 +53,9 @@ def menu_operaciones(cuenta):
 
         op = input("Opción: ").strip()
         print()
-
+        
         if op == "1":
-            cuenta.ver_datos_cuenta()
+            cuenta.informe_datos()
         elif op == "2":
             cuenta.ver_saldo()
         elif op == "3":
@@ -66,7 +66,7 @@ def menu_operaciones(cuenta):
             cuenta.extraer(monto)
         elif op == "5":
             nuevo = input("Nuevo alias: ")
-            cuenta.cambiar_alias(nuevo)
+            cuenta.alias = nuevo
         elif op == "6" and hasattr(cuenta, "cambiar_descubierto"):
             nuevo = input("Nuevo descubierto: ")
             cuenta.cambiar_descubierto(nuevo)

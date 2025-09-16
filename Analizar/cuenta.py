@@ -52,6 +52,11 @@ class Cuenta:
     @alias.setter
     def alias(self, valor):
         self.__alias = valor
+
+    def ver_saldo(self):
+        print("#Consulta de saldo:")
+        print(f"#Cliente: {self.cliente.nombre_formateado} – N°: {self.numero_cuenta_formateado}")
+        print(f"#Saldo: {self.saldo_formateado}")
     
     def detalle_producto(self):
         return f"Producto: Cuenta."
@@ -65,7 +70,7 @@ class Cuenta:
         motivo = input("Motivo de la operación: ").strip()
         print(
             f"Movimiento ejecutado:\n"
-            f"N° {self.numero_cuenta_formateado} - Cliente: {self.cliente.nombre_formateado()}\n"
+            f"N° {self.numero_cuenta_formateado} - Cliente: {self.cliente.nombre_formateado}\n"
             f"Fecha: {ahora_str()} - Motivo: {motivo} - Monto: {ch}{monto:.2f}"
         )
 
@@ -97,7 +102,7 @@ class CuentaAhorro(Cuenta):
 
     @property
     def numero_cuenta_formateado(self):
-        return f"CA $ {self.__numero_cuenta}"
+        return f"CA $ {self.numero_cuenta}"
 
 
 class CuentaCorriente(Cuenta):
@@ -115,7 +120,7 @@ class CuentaCorriente(Cuenta):
 
     @property
     def numero_cuenta_formateado(self):
-        return f"CC $ {self.__numero_cuenta}"
+        return f"CC $ {self.numero_cuenta}"
 
     @property
     def descubierto(self):
@@ -142,7 +147,7 @@ class CuentaCorriente(Cuenta):
 
         # Ajuste del saldo y salida formateada (usa helpers de base)
         self._Cuenta__saldo = saldo_actual - mv
-        self._Cuenta__imprimir_movimiento("-", mv)
+        super()._Cuenta__imprimir_movimiento("-", mv)
         return True
 
     def detalle_producto(self):
@@ -150,11 +155,11 @@ class CuentaCorriente(Cuenta):
 
     def informe_datos(self):
         print("Consulta de datos:")
-        print(f"Cliente: {self.cliente.nombre_formateado()}")
-        print(f"CUIL: {self.cliente.cuil_formateado()}")
+        print(f"Cliente: {self.cliente.nombre_formateado}")
+        print(f"CUIL: {self.cliente.cuil_formateado}")
         print(f"N°: {self.numero_cuenta_formateado} - Alias: {self.alias} - CBU: {self.cbu}")
 
     def ver_saldo(self):
         print("#Consulta de saldo:")
-        print(f"#Cliente: {self.cliente.nombre_formateado()} – N°: {self.numero_cuenta_formateado}")
+        print(f"#Cliente: {self.cliente.nombre_formateado} – N°: {self.numero_cuenta_formateado}")
         print(f"#Saldo: {self.saldo_formateado} – Descubierto: {self.descubierto_formateado}")
