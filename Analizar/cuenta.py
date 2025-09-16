@@ -7,8 +7,22 @@ from validaciones_cuenta import (
     pedir_cbu_hasta_valido,
     pedir_numero_cuenta_hasta_valido,
     pedir_saldo_inicial_hasta_valido,
-    pedir_monto_hasta_valido
+    pedir_monto_hasta_valido,
+    pedir_motivo_hasta_valido
 )
+
+class Movimiento:
+    __slots__ = ("fecha", "monto", "tipo", "motivo")
+
+    def __init__(self, fecha: str, monto: float, tipo: str, motivo: str) -> None:
+        self.fecha = fecha
+        self.monto = float(monto)
+        self.tipo = tipo.upper()  # "deposito" o "extraccion"
+        self.motivo = motivo
+
+    def __str__(self) -> str:
+        signo = "+" if self.tipo.startswith("DEP") else "-"
+        return f"{self.fecha} | {self.tipo:11s} | {signo}${self.monto:.2f} | {self.motivo}"
 
 
 class Cuenta:
@@ -18,6 +32,7 @@ class Cuenta:
         self.__alias = pedir_alias_hasta_valido(alias)
         self.__cliente = cliente
         self.__saldo = pedir_saldo_inicial_hasta_valido(saldo)
+        self._movimientos: list[Movimiento] = []  # lista de objetos Movimiento
 
     # --- getters ---
     @property
@@ -66,7 +81,7 @@ class Cuenta:
         print(f"Cliente: {self.cliente.nombre}")
         print(f"N°: {self.numero_cuenta_formateado} - Alias: {self.alias} - CBU: {self.cbu}")
 
-    def __imprimir_movimiento(self, ch, monto):
+    def __imprimir_movimiento(self, ch, monto, motivo=""):
         motivo = input("Motivo de la operación: ").strip()
         print(
             f"Movimiento ejecutado:\n"
@@ -76,8 +91,11 @@ class Cuenta:
 
     def depositar(self, monto) -> bool:
         mv = pedir_monto_hasta_valido(monto)
+        motivo = pedir_motivo_hasta_valido(input("Motivo (1..20): "))
         self.__saldo += mv
-        self.__imprimir_movimiento("+", mv)
+        # registrar movimiento
+        self._movimientos.append(Movimiento(ahora_str(), mv, "DEPOSITO", motivo))
+        self.__imprimir_movimiento("+", mv, motivo)
         return True
 
     def extraer(self, monto) -> bool:
@@ -85,9 +103,23 @@ class Cuenta:
         if mv > self.__saldo:
             print("Fondos insuficientes.")
             return False
+        motivo = pedir_motivo_hasta_valido(input("Motivo (1..20): "))
         self.__saldo -= mv
-        self.__imprimir_movimiento("-", mv)
+        # registrar movimiento
+        self._movimientos.append(Movimiento(ahora_str(), mv, "EXTRACCION", motivo))
+        self.__imprimir_movimiento("-", mv, motivo)
         return True
+
+    def ver_movimientos(self):
+        if not self._movimientos:
+            print("No hay movimientos registrados.")
+            return
+        print(f"Movimientos de la cuenta {self.numero_cuenta_formateado}:")
+        print(f"{'Fecha y hora':20s} | {'Importe':>12s} | {'Motivo':>20s}") # Encabezado
+        print("-" * 60)
+        for mov in self._movimientos:
+            signo = "+" if mov.tipo.startswith("DEP") else "-"
+            print(f"{mov.fecha:20s} | {signo}${mov.monto:10.2f} | {mov.motivo:20s}")
 
     def __str__(self) -> str:
         return (

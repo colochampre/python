@@ -91,6 +91,15 @@ def pedir_saldo_inicial_hasta_valido(valor=None) -> float:
     return float(saldo)
 
 
+def pedir_motivo_hasta_valido(valor) -> str:
+    while True:
+        motivo = limpiar_texto(valor)
+        if 1 <= len(motivo) <= 20:
+            return motivo
+        print("Motivo inválido. Debe tener entre 1 y 20 caracteres.")
+        valor = input("Motivo (1..20): ")
+
+
 # --- pedir hasta válido genérico (loop sin exceptions hacia afuera) ---
 # def pedir_hasta_valido(msg_inicial, msg_error, fn_valida, postproc=lambda x: x):
 #     valor = postproc(input(msg_inicial))

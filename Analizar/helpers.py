@@ -29,3 +29,4 @@ def pasar_a_numero(valor) -> float:
 
 def solo_digitos(valor) -> str:
     return "".join(ch for ch in str(valor) if ch.isdigit())
+

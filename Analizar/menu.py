@@ -59,8 +59,9 @@ def menu_operaciones(cuenta):
         print("3) Depositar")
         print("4) Extraer")
         print("5) Cambiar alias")
+        print("6) Ver movimientos")
         if hasattr(cuenta, "cambiar_descubierto"):
-            print("6) Cambiar descubierto")
+            print("7) Cambiar descubierto")
         print("0) Salir")
 
         op = input("Opción: ").strip()
@@ -79,7 +80,9 @@ def menu_operaciones(cuenta):
         elif op == "5":
             nuevo = input("Nuevo alias: ")
             cuenta.alias = nuevo
-        elif op == "6" and hasattr(cuenta, "cambiar_descubierto"):
+        elif op == "6":
+            cuenta.ver_movimientos()
+        elif op == "7" and hasattr(cuenta, "cambiar_descubierto"):
             nuevo = input("Nuevo descubierto: ")
             cuenta.cambiar_descubierto(nuevo)
         elif op == "0":
