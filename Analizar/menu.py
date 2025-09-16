@@ -9,9 +9,21 @@ def construir_cliente():
     tipo = input("Elegí tipo (1/2): ").strip()
 
     if tipo == "2":
-        return Empresa(mail="", telefono="", direccion="", nombre_fantasia="", nombre_juridico="")
+        nombre_juridico = input("Razón Social: ")
+        nombre_fantasia = input("Nombre de fantasía: ")
+        cuil = input("CUIL: ")
+        mail = input("Mail: ")
+        telefono = input("Teléfono: ")
+        direccion = input("Dirección: ")
+        return Empresa(mail=mail, telefono=telefono, direccion=direccion, nombre_fantasia=nombre_fantasia, nombre_juridico=nombre_juridico, cuil=cuil)
     else:
-        return PersonaFisica(nombre="", cuil="", mail="", telefono="", direccion="", dni="")
+        nombre = input("Nombre: ")
+        cuil = input("CUIL: ")
+        mail = input("Mail: ")
+        telefono = input("Teléfono: ")
+        direccion = input("Dirección: ")
+        dni = input("DNI: ")
+        return PersonaFisica(nombre=nombre, cuil=cuil, mail=mail, telefono=telefono, direccion=direccion, dni=dni)
 
 
 def construir_cuenta(cliente):
